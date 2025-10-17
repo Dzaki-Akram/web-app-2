@@ -14,6 +14,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       
+      - name: Clean old files
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            rm -f /var/www/web2.com/public_html/index.php
+            rm -f /var/www/web2.com/public_html/*.tar.gz
+      
       - name: Deploy to Server
         uses: appleboy/scp-action@master
         with:
@@ -22,6 +32,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "index.php"
           target: "/var/www/web2.com/public_html/"
+          overwrite: true
           strip_components: 0
       
       - name: Set Permissions
